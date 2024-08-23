@@ -3,21 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главное меню</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <title>Schooll Poker - Главное меню</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Подключение CSS стилей -->
 </head>
 <body>
-    <div id="main-menu">
-        <h1 id="user-name"></h1>
-        <button onclick="openPage('play.html')">Играть</button>
-        <button onclick="openPage('rules.html')">Правила</button>
-        <button onclick="openPage('tasks.html')">Задания</button>
-        <button onclick="openPage('settings.html')">Настройки</button>
+    <div class="main-menu">
+        <!-- Имя и фамилия пользователя -->
+        <div class="user-name"><span id="first_name"></span><span id="last_name"></span></div>
+
+        <!-- Логотип игры "Schooll Poker" -->
+        <div class="game-logo">
+            <h1>Schooll Poker</h1>
+        </div>
+
+        <!-- Кнопки действий -->
+        <a href="#" class="button">ИГРАТЬ</a>
+        <a href="#" class="button">Правила</a>
+        <a href="#" class="button">Задания</a>
+        <a href="#" class="button">Настройки</a>
     </div>
-    <div id="page-content" style="display: none;">
-        <button id="back-button" onclick="goBack()">Назад</button>
-        <div id="page-title"></div>
-    </div>
+	
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            fetch('/get_user_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('first_name').textContent = data.first_name;
+                    document.getElementById('last_name').textContent = data.last_name;
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        });
+    </script>	
+	
 </body>
 </html>

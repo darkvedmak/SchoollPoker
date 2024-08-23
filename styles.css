@@ -1,0 +1,47 @@
+/* Общие стили для всех текстов */
+body {
+    font-family: 'Arial', sans-serif; /* Основной шрифт */
+    color: #000; /* Цвет текста — черный */
+}
+
+/* Стили для имени и фамилии пользователя */
+.user-name {
+    font-size: 28px;
+    font-family: 'RoundSoft', sans-serif; /* Пример стилизованного шрифта */
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Стили для логотипа игры */
+.game-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.game-logo h1 {
+    background-color: #2F4F2F; /* Темно-зеленый фон */
+    color: #FFFFFF; /* Белый текст */
+    border: 2px solid #FFFFFF; /* Белая рамка */
+    padding: 20px;
+    font-size: 50px;
+    font-family: 'Chalkboard', cursive; /* Стилизованный шрифт под мел */
+}
+
+/* Стили для кнопок */
+.button {
+    display: block;
+    width: 220px;
+    padding: 15px 0;
+    margin: 10px auto;
+    text-align: center;
+    background-color: #F0F0F0; /* Светло-серый фон */
+    border: 2px solid #000; /* Черная рамка */
+    color: #000; /* Цвет текста — черный */
+    font-size: 24px;
+    font-family: 'RoundSoft', sans-serif; /* Шрифт округлый */
+    text-decoration: none; /* Убирает подчеркивание */
+}
+
+.button:hover {
+    background-color: #E0E0E0; /* Более темный фон при наведении */
+}
