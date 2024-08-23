@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 App</title>
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-        }
-    </style>
+    <title>Главное меню</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Функция в разработке</h1>
-        <p>Скоро здесь будет функционал вашего игрового меню.</p>
+    <div id="main-menu">
+        <h1 id="user-name"></h1>
+        <button onclick="openPage('play.html')">Играть</button>
+        <button onclick="openPage('rules.html')">Правила</button>
+        <button onclick="openPage('tasks.html')">Задания</button>
+        <button onclick="openPage('settings.html')">Настройки</button>
+    </div>
+    <div id="page-content" style="display: none;">
+        <button id="back-button" onclick="goBack()">Назад</button>
+        <div id="page-title"></div>
     </div>
 </body>
 </html>
