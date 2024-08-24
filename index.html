@@ -19,7 +19,7 @@
         <a href="settings.html" class="button">Настройки</a>
     </div>
 
-        <div id="game-modes" style="display: none;">
+    <div id="game-modes" style="display: none;">
         <h2>Режимы игры</h2>
         <button onclick="startSearch('quick')">Быстрая игра</button>
         <button onclick="startSearch('tournament')">Турнир</button>
@@ -35,6 +35,7 @@
         const tg = window.Telegram.WebApp;
 
         function showGameModes() {
+            document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game-modes').style.display = 'block';
             document.getElementById('search-screen').style.display = 'none';
         }
@@ -46,34 +47,17 @@
         }
 
         function cancelSearch() {
-            // Отправляем запрос на сервер для отмены поиска
-            fetch('/api/cancel_search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: tg.initDataUnsafe.user.id
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showGameModes(); // Возвращаемся в меню режимов игры
-                } else {
-                    alert('Ошибка при отмене поиска');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Произошла ошибка');
-            });
+            // Просто закрываем окно лобби и отображаем меню "Режимы игры"
+            showGameModes();
         }
 
-        // Показываем меню режимов игры при загрузке страницы
-        document.addEventListener('DOMContentLoaded', showGameModes);
+        // Показываем главное меню при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('main-menu').style.display = 'block';
+            document.getElementById('play-button').addEventListener('click', showGameModes);
+        });
     </script>
 
     <script src="app.js"></script>
 </body>
-</html>
+</html
