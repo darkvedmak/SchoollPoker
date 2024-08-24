@@ -8,74 +8,31 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="main-menu">
+    <div id="main-menu" class="menu">
         <div class="user-name"><span id="user_name"></span></div>
-
         <div class="game-logo">
-            <h1>Schooll Poker v1</h1>
+            <h1>Schooll Poker</h1>
         </div>
-
-        <a href="play.html" class="button">ИГРАТЬ</a>
+        <button id="play-button" class="button">ИГРАТЬ</button>
         <a href="rules.html" class="button">Правила</a>
-        <a href="settings.html" class="button">Задания</a>
-        <a href="tasks.html" class="button">Настройки</a>
+        <a href="tasks.html" class="button">Задания</a>
+        <a href="settings.html" class="button">Настройки</a>
     </div>
 
-    <script>
-        function clientLog(message) {
-            fetch('/log', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: message }),
-            });
-        }
+    <div id="game-modes" class="menu" style="display: none;">
+        <h2>Режимы игры</h2>
+        <button id="normal-game" class="button">Обычная игра</button>
+        <button id="ranked-game" class="button">Рейтинговая игра</button>
+        <button id="training" class="button">Тренировка</button>
+        <button id="back-to-main" class="button">Назад</button>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', (event) => {
-            clientLog("DOM fully loaded and parsed");
-            const tgApp = window.Telegram.WebApp;
-            clientLog("Telegram WebApp object: " + JSON.stringify(tgApp));
+    <div id="lobby" class="menu" style="display: none;">
+        <h2 id="lobby-status">Постановка в очередь подбора игроков</h2>
+        <div id="loading-animation" class="loader"></div>
+        <button id="cancel-search" class="button">Отменить поиск</button>
+    </div>
 
-            if (tgApp) {
-                tgApp.ready();
-                const user = tgApp.initDataUnsafe.user;
-                clientLog("User data from Telegram: " + JSON.stringify(user));
-
-                if (user) {
-                    const telegram_id = user.id;
-                    clientLog("Attempting to fetch user data for telegram_id: " + telegram_id);
-
-                    fetch(`http://localhost:5000/api/user_data/${telegram_id}`)
-                        .then(response => {
-                            clientLog("Server response: " + response.status);
-                            return response.json();
-                        })
-                        .then(data => {
-                            clientLog("Received data from server: " + JSON.stringify(data));
-                            const userNameElement = document.getElementById('user_name');
-                            if (userNameElement) {
-                                userNameElement.textContent = `${data.first_name} ${data.last_name}`;
-                                clientLog("User name updated in DOM");
-                            } else {
-                                clientLog("Error: Element with id 'user_name' not found");
-                            }
-                            localStorage.setItem('session_id', data.session_id);
-                            clientLog('Session ID saved: ' + data.session_id);
-                            clientLog('Player stats: ' + JSON.stringify(data.stats));
-                            clientLog('Player tasks: ' + JSON.stringify(data.tasks));
-                        })
-                        .catch(error => {
-                            clientLog('Error fetching user data: ' + error.message);
-                            alert("Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.");
-                        });
-                } else {
-                    clientLog("Error: User data not available from Telegram WebApp");
-                }
-            } else {
-                clientLog('Error: Telegram WebApp is not available');
-            }
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
