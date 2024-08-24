@@ -19,19 +19,60 @@
         <a href="settings.html" class="button">Настройки</a>
     </div>
 
-    <div id="game-modes" class="menu" style="display: none;">
+        <div id="game-modes" style="display: none;">
         <h2>Режимы игры</h2>
-        <button id="normal-game" class="button">Обычная игра</button>
-        <button id="ranked-game" class="button">Рейтинговая игра</button>
-        <button id="training" class="button">Тренировка</button>
-        <button id="back-to-main" class="button">Назад</button>
+        <button onclick="startSearch('quick')">Быстрая игра</button>
+        <button onclick="startSearch('tournament')">Турнир</button>
+        <!-- Добавьте другие режимы по необходимости -->
     </div>
 
-    <div id="lobby" class="menu" style="display: none;">
-        <h2 id="lobby-status">Постановка в очередь подбора игроков</h2>
-        <div id="loading-animation" class="loader"></div>
-        <button id="cancel-search" class="button">Отменить поиск</button>
+    <div id="search-screen" style="display: none;">
+        <h2>Поиск игры...</h2>
+        <button onclick="cancelSearch()">Отменить поиск</button>
     </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        function showGameModes() {
+            document.getElementById('game-modes').style.display = 'block';
+            document.getElementById('search-screen').style.display = 'none';
+        }
+
+        function startSearch(mode) {
+            document.getElementById('game-modes').style.display = 'none';
+            document.getElementById('search-screen').style.display = 'block';
+            // Здесь код для начала поиска игры
+        }
+
+        function cancelSearch() {
+            // Отправляем запрос на сервер для отмены поиска
+            fetch('/api/cancel_search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    telegram_id: tg.initDataUnsafe.user.id
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showGameModes(); // Возвращаемся в меню режимов игры
+                } else {
+                    alert('Ошибка при отмене поиска');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка');
+            });
+        }
+
+        // Показываем меню режимов игры при загрузке страницы
+        document.addEventListener('DOMContentLoaded', showGameModes);
+    </script>
 
     <script src="app.js"></script>
 </body>
