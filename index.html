@@ -19,11 +19,15 @@
         <a href="settings.html" class="button">Настройки</a>
     </div>
 
-    <div id="game-modes" style="display: none;">
-        <h2>Режимы игры</h2>
-        <button onclick="startSearch('quick')">Быстрая игра</button>
-        <button onclick="startSearch('tournament')">Турнир</button>
-        <!-- Добавьте другие режимы по необходимости -->
+    <div id="game-modes" class="menu" style="display: none;">
+        <div class="user-name"><span id="user_name_modes"></span></div>
+        <div class="game-logo">
+            <h1>Schooll Poker</h1>
+        </div>
+        <button onclick="startSearch('normal')" class="button">Обычная игра</button>
+        <button onclick="startSearch('rated')" class="button">Рейтинговая игра</button>
+        <button onclick="startSearch('training')" class="button">Тренировка</button>
+        <button onclick="showMainMenu()" class="button">Назад</button>
     </div>
 
     <div id="search-screen" style="display: none;">
@@ -34,10 +38,18 @@
     <script>
         const tg = window.Telegram.WebApp;
 
+        function showMainMenu() {
+            document.getElementById('main-menu').style.display = 'block';
+            document.getElementById('game-modes').style.display = 'none';
+            document.getElementById('search-screen').style.display = 'none';
+        }
+
         function showGameModes() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game-modes').style.display = 'block';
             document.getElementById('search-screen').style.display = 'none';
+            // Копируем имя пользователя из главного меню в меню режимов игры
+            document.getElementById('user_name_modes').textContent = document.getElementById('user_name').textContent;
         }
 
         function startSearch(mode) {
@@ -47,17 +59,24 @@
         }
 
         function cancelSearch() {
-            // Просто закрываем окно лобби и отображаем меню "Режимы игры"
             showGameModes();
         }
 
         // Показываем главное меню при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('main-menu').style.display = 'block';
+            showMainMenu();
             document.getElementById('play-button').addEventListener('click', showGameModes);
+
+            // Здесь код для получения имени пользователя и установки его в элемент #user_name
+            // Например:
+            // fetch('/api/user_data')
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         document.getElementById('user_name').textContent = `${data.first_name} ${data.last_name}`;
+            //     });
         });
     </script>
 
     <script src="app.js"></script>
 </body>
-</html
+</html>
