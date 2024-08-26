@@ -24,22 +24,36 @@
         <div class="game-logo">
             <h1>Schooll Poker</h1>
         </div>
-        <button onclick="startSearch('normal')" class="button">Обычная игра</button>
-        <button onclick="startSearch('rated')" class="button">Рейтинговая игра</button>
-        <button onclick="startSearch('training')" class="button">Тренировка</button>
+        <button onclick="startGame('solo')" class="button">Одиночная игра</button>
+        <button onclick="startGame('training')" class="button">Тренировка</button>
         <button onclick="showMainMenu()" class="button">Назад</button>
     </div>
 
-    <div id="search-screen" style="display: none;">
-        <h2>Поиск игры...</h2>
-        <button onclick="cancelSearch()">Отменить поиск</button>
-        <button id="solo-training-button" style="display: none;" onclick="startSoloTraining()">ОДИНОЧНАЯ ТРЕНИРОВКА</button>
+    <div id="game-table" style="display: none;">
+        <div id="opponent-info">
+            <div id="opponent-name"></div>
+            <div id="opponent-dice" class="dice-area">
+                <div class="dice-lid"></div>
+                <div class="dice-box"></div>
+            </div>
+        </div>
+
+        <table id="score-table">
+            <!-- Table rows will be dynamically generated -->
+        </table>
+
+        <div id="player-dice" class="dice-area">
+            <div class="dice-lid"></div>
+            <div class="dice-box"></div>
+        </div>
+
+        <button id="roll-dice">Бросить кубики</button>
     </div>
 
-    <div id="ready-screen" style="display: none;">
-        <h2>Игра найдена!</h2>
-        <p>Нажмите кнопку "Готов", чтобы начать игру</p>
-        <button onclick="playerReady()">Готов</button>
+    <div id="error-screen" style="display: none;">
+        <h2>Ошибка</h2>
+        <p id="error-message"></p>
+        <button onclick="showGameModes()">Ок</button>
     </div>
 
     <script src="app.js"></script>
