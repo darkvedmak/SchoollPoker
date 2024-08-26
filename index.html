@@ -33,57 +33,14 @@
     <div id="search-screen" style="display: none;">
         <h2>Поиск игры...</h2>
         <button onclick="cancelSearch()">Отменить поиск</button>
+        <button id="solo-training-button" style="display: none;" onclick="startSoloTraining()">ОДИНОЧНАЯ ТРЕНИРОВКА</button>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-
-        function showMainMenu() {
-            document.getElementById('main-menu').style.display = 'block';
-            document.getElementById('game-modes').style.display = 'none';
-            document.getElementById('search-screen').style.display = 'none';
-        }
-
-        function showGameModes() {
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('game-modes').style.display = 'block';
-            document.getElementById('search-screen').style.display = 'none';
-            // Копируем имя пользователя из главного меню в меню режимов игры
-            document.getElementById('user_name_modes').textContent = document.getElementById('user_name').textContent;
-        }
-
-        function startSearch(mode) {
-            document.getElementById('game-modes').style.display = 'none';
-            document.getElementById('search-screen').style.display = 'block';
-            // Здесь код для начала поиска игры
-        }
-
-		function cancelSearch() {
-			const telegram_id = tg.initDataUnsafe.user.id;
-
-			fetch('/api/cancel_search', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ telegram_id: telegram_id }),
-			})
-			.then(response => response.json())
-			.then(data => {
-				if (data.status === 'success') {
-					console.log('Search cancelled successfully');
-					showGameModes();
-				} else {
-					console.error('Error cancelling search:', data.message);
-					alert('Ошибка при отмене поиска. Пожалуйста, попробуйте еще раз.');
-				}
-			})
-			.catch(error => {
-				console.error('Error:', error);
-				alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
-			});
-		}
-    </script>
+    <div id="ready-screen" style="display: none;">
+        <h2>Игра найдена!</h2>
+        <p>Нажмите кнопку "Готов", чтобы начать игру</p>
+        <button onclick="playerReady()">Готов</button>
+    </div>
 
     <script src="app.js"></script>
 </body>

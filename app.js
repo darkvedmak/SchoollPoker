@@ -1,25 +1,13 @@
+const tg = window.Telegram.WebApp;
+const SERVER_URL = 'http://localhost:5000';
+let telegram_id;
+let currentLobbyId = null;
+let currentGameMode = null;
+
 document.addEventListener('DOMContentLoaded', (event) => {
-    // Константа с адресом сервера
-    const SERVER_URL = 'http://localhost:5000';
-
-    const tgApp = window.Telegram.WebApp;
-    let telegram_id;
-    let currentGameMode;
-
-    const mainMenu = document.getElementById('main-menu');
-    const gameModes = document.getElementById('game-modes');
-    const lobby = document.getElementById('lobby');
-    const playButton = document.getElementById('play-button');
-    const backToMainButton = document.getElementById('back-to-main');
-    const normalGameButton = document.getElementById('normal-game');
-    const rankedGameButton = document.getElementById('ranked-game');
-    const trainingButton = document.getElementById('training');
-    const cancelSearchButton = document.getElementById('cancel-search');
-    const lobbyStatus = document.getElementById('lobby-status');
-
-    if (tgApp) {
-        tgApp.ready();
-        const user = tgApp.initDataUnsafe.user;
+    if (tg) {
+        tg.ready();
+        const user = tg.initDataUnsafe.user;
         if (user) {
             telegram_id = user.id;
             fetchUserData(telegram_id);
@@ -30,102 +18,158 @@ document.addEventListener('DOMContentLoaded', (event) => {
         console.error('Telegram WebApp is not available');
     }
 
-    function fetchUserData(telegram_id) {
-        fetch(`${SERVER_URL}/api/user_data/${telegram_id}`)
+    document.getElementById('play-button').addEventListener('click', showGameModes);
+});
+
+function fetchUserData(telegram_id) {
+    fetch(`${SERVER_URL}/api/user_data/${telegram_id}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('user_name').textContent = `${data.first_name} ${data.last_name}`;
+            document.getElementById('user_name_modes').textContent = `${data.first_name} ${data.last_name}`;
+            localStorage.setItem('session_id', data.session_id);
+        })
+        .catch(error => console.error('Error fetching user data:', error));
+}
+
+function showMainMenu() {
+    document.getElementById('main-menu').style.display = 'block';
+    document.getElementById('game-modes').style.display = 'none';
+    document.getElementById('search-screen').style.display = 'none';
+    document.getElementById('ready-screen').style.display = 'none';
+}
+
+function showGameModes() {
+    document.getElementById('main-menu').style.display = 'none';
+    document.getElementById('game-modes').style.display = 'block';
+}
+
+function startSearch(mode) {
+    currentGameMode = mode;
+    fetch(`${SERVER_URL}/api/start_search`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegram_id: telegram_id, queue_type: mode }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById('game-modes').style.display = 'none';
+            document.getElementById('search-screen').style.display = 'block';
+            if (mode === 'training') {
+                document.getElementById('solo-training-button').style.display = 'block';
+            }
+        } else {
+            console.error('Error starting search:', data.message);
+            alert('Ошибка при начале поиска. Пожалуйста, попробуйте еще раз.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+    });
+}
+
+function cancelSearch() {
+    fetch(`${SERVER_URL}/api/cancel_search`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegram_id: telegram_id }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showGameModes();
+        } else {
+            console.error('Error cancelling search:', data.message);
+            alert('Ошибка при отмене поиска. Пожалуйста, попробуйте еще раз.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+    });
+}
+
+function startSoloTraining() {
+    fetch(`${SERVER_URL}/api/start_solo_training`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegram_id: telegram_id }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            currentLobbyId = data.lobby_id;
+            showReadyScreen();
+        } else {
+            console.error('Error starting solo training:', data.message);
+            alert('Ошибка при начале одиночной тренировки. Пожалуйста, попробуйте еще раз.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+    });
+}
+
+function showReadyScreen() {
+    document.getElementById('search-screen').style.display = 'none';
+    document.getElementById('ready-screen').style.display = 'block';
+}
+
+function playerReady() {
+    fetch(`${SERVER_URL}/api/player_ready`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegram_id: telegram_id, lobby_id: currentLobbyId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            if (data.message === 'Game starting') {
+                // Здесь должна быть логика для начала игры
+                alert('Игра начинается!');
+            } else {
+                alert('Готов к игре. Ожидание других игроков...');
+                startLobbyStatusCheck();
+            }
+        } else {
+            console.error('Error setting player ready:', data.message);
+            alert('Ошибка при подготовке к игре. Пожалуйста, попробуйте еще раз.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+    });
+}
+
+function checkLobbyStatus() {
+    if (currentLobbyId) {
+        fetch(`${SERVER_URL}/api/lobby_status/${currentLobbyId}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('user_name').textContent = `${data.first_name} ${data.last_name}`;
-                localStorage.setItem('session_id', data.session_id);
+                if (data.status === 'ready') {
+                    clearInterval(lobbyCheckInterval);
+                    // Здесь должна быть логика для начала игры
+                    alert('Все игроки готовы. Игра начинается!');
+                }
             })
-            .catch(error => console.error('Error fetching user data:', error));
+            .catch(error => console.error('Error checking lobby status:', error));
     }
+}
 
-    playButton.addEventListener('click', () => {
-        mainMenu.style.display = 'none';
-        gameModes.style.display = 'block';
-    });
+let lobbyCheckInterval;
 
-    backToMainButton.addEventListener('click', () => {
-        gameModes.style.display = 'none';
-        mainMenu.style.display = 'block';
-    });
-
-    [normalGameButton, rankedGameButton, trainingButton].forEach(button => {
-        button.addEventListener('click', (event) => {
-            currentGameMode = event.target.id;
-            searchLobby(currentGameMode);
-        });
-    });
-
-    cancelSearchButton.addEventListener('click', cancelSearch);
-
-    function searchLobby(gameMode) {
-        gameModes.style.display = 'none';
-        lobby.style.display = 'block';
-        lobbyStatus.textContent = 'Постановка в очередь подбора игроков';
-
-        fetch(`${SERVER_URL}/api/search_lobby`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telegram_id: telegram_id,
-                game_mode: gameMode
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'queued') {
-                lobbyStatus.textContent = 'Ожидание соперника';
-                waitForLobby();
-            } else {
-                lobbyStatus.textContent = 'Ошибка при поиске лобби';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            lobbyStatus.textContent = 'Ошибка при поиске лобби';
-        });
-    }
-
-    function waitForLobby() {
-        const intervalId = setInterval(() => {
-            fetch(`${SERVER_URL}/api/check_lobby/${telegram_id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.lobby_id) {
-                        clearInterval(intervalId);
-                        lobbyStatus.textContent = `Лобби найдено! ID: ${data.lobby_id}`;
-                        // Здесь можно добавить логику для перехода в игру
-                    }
-                })
-                .catch(error => console.error('Error checking lobby:', error));
-        }, 5000); // Проверяем каждые 5 секунд
-    }
-
-    function cancelSearch() {
-        fetch(`${SERVER_URL}/api/cancel_search`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telegram_id: telegram_id
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'cancelled') {
-                lobby.style.display = 'none';
-                gameModes.style.display = 'block';
-            } else {
-                lobbyStatus.textContent = 'Ошибка при отмене поиска';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            lobbyStatus.textContent = 'Ошибка при отмене поиска';
-        });
-    }
-});
+function startLobbyStatusCheck() {
+    lobbyCheckInterval = setInterval(checkLobbyStatus, 5000); // Проверка каждые 5 секунд
+}
