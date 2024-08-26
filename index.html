@@ -8,54 +8,64 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="main-menu" class="menu">
+    <div class="main-menu">
         <div class="user-name"><span id="user_name"></span></div>
+
         <div class="game-logo">
             <h1>Schooll Poker</h1>
         </div>
-        <button id="play-button" class="button">ИГРАТЬ</button>
+
+        <a href="play.html" class="button">ИГРАТЬ</a>
         <a href="rules.html" class="button">Правила</a>
-        <a href="tasks.html" class="button">Задания</a>
-        <a href="settings.html" class="button">Настройки</a>
+        <a href="settings.html" class="button">Задания</a>
+        <a href="tasks.html" class="button">Настройки</a>
     </div>
 
-    <div id="game-modes" class="menu" style="display: none;">
-        <div class="user-name"><span id="user_name_modes"></span></div>
-        <div class="game-logo">
-            <h1>Schooll Poker</h1>
-        </div>
-        <button onclick="startGame('solo')" class="button">Одиночная игра</button>
-        <button onclick="startGame('training')" class="button">Тренировка</button>
-        <button onclick="showMainMenu()" class="button">Назад</button>
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log("DOM fully loaded and parsed");
+            const tgApp = window.Telegram.WebApp;
+            console.log("Telegram WebApp object:", tgApp);
 
-    <div id="game-table" style="display: none;">
-        <div id="opponent-info">
-            <div id="opponent-name"></div>
-            <div id="opponent-dice" class="dice-area">
-                <div class="dice-lid"></div>
-                <div class="dice-box"></div>
-            </div>
-        </div>
+            if (tgApp) {
+                tgApp.ready();
+                const user = tgApp.initDataUnsafe.user;
+                console.log("User data from Telegram:", user);
 
-        <table id="score-table">
-            <!-- Table rows will be dynamically generated -->
-        </table>
+                if (user) {
+                    const telegram_id = user.id;
+                    console.log("Attempting to fetch user data for telegram_id:", telegram_id);
 
-        <div id="player-dice" class="dice-area">
-            <div class="dice-lid"></div>
-            <div class="dice-box"></div>
-        </div>
-
-        <button id="roll-dice">Бросить кубики</button>
-    </div>
-
-    <div id="error-screen" style="display: none;">
-        <h2>Ошибка</h2>
-        <p id="error-message"></p>
-        <button onclick="showGameModes()">Ок</button>
-    </div>
-
-    <script src="app.js"></script>
+                    fetch(`http://localhost:5000/api/user_data/${telegram_id}`)
+                        .then(response => {
+                            console.log("Server response:", response);
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Received data from server:", data);
+                            const userNameElement = document.getElementById('user_name');
+                            if (userNameElement) {
+                                userNameElement.textContent = `${data.first_name} ${data.last_name}`;
+                                console.log("User name updated in DOM");
+                            } else {
+                                console.error("Element with id 'user_name' not found");
+                            }
+                            localStorage.setItem('session_id', data.session_id);
+                            console.log('Session ID saved:', data.session_id);
+                            console.log('Player stats:', data.stats);
+                            console.log('Player tasks:', data.tasks);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching user data:', error);
+                            alert("Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.");
+                        });
+                } else {
+                    console.error("User data not available from Telegram WebApp");
+                }
+            } else {
+                console.error('Telegram WebApp is not available');
+            }
+        });
+    </script>
 </body>
 </html>
